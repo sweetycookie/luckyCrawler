@@ -1,5 +1,6 @@
 import requests
 import pymysql
+import configparser
 
 luckyUrl    = "https://www.dhlottery.co.kr/lt645/result"
 lucky_api   = "https://www.dhlottery.co.kr/lt645/selectPstLt645Info.do"
@@ -14,21 +15,19 @@ pension_last_round= "SELECT round FROM sweetycooki.TB_PENSION ORDER BY seq DESC 
 
 headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (HTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
 
+parser = configparser.ConfigParser()
+parser.read('./config.ini')
+
 def db_conn() :
   global conn
   global cursor
-  db_host   = 'sweetycooki.mycafe24.com'
-  #db_host   = 'localhost'
-  db_user   = 'sweetycooki'
-  db_pw     = 'Cafe240110'
-  db_dbname = 'sweetycooki'
 
   try:
-    conn = pymysql.connect(host     = db_host,
-                           user     = db_user,
-                           password = db_pw,
-                           db       = db_dbname,
-                           port     = 3306,
+    conn = pymysql.connect(host     = parser.get('db_config', 'hostname'),
+                           user     = parser.get('db_config', 'username'),
+                           password = parser.get('db_config', 'password'),
+                           db       = parser.get('db_config', 'database'),
+                           port     = parser.getint('db_config', 'port'),
                            charset  ='utf8')
   except pymysql.err.MySQLError as e :
     print(f"DB 연결 오류 :: {e}")
@@ -52,7 +51,7 @@ def job_lucky_new() :
   get_data = cursor.fetchone()
   old_last_round = get_data[0]
 
-  ## 새로운 회차 가져오기
+  ## 새로운 회차 가져오기2
   item = process_2_data[0]
   new_round = str(item.get("ltEpsd")) + "회"
   number_list = str(item.get("tm1WnNo")) + ","
