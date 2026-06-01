@@ -15,19 +15,24 @@ pension_last_round= "SELECT round FROM sweetycooki.TB_PENSION ORDER BY seq DESC 
 
 headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (HTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
 
-parser = configparser.ConfigParser()
-parser.read('./config.ini')
+def get_config() :
+  global parser
+
+  parser = configparser.ConfigParser()
+  #parser.read('./config.ini')
+  parser.read('https://github.com/sweetycookie/luckyCrawler/blob/main/')
+  parser.read('config.ini')
 
 def db_conn() :
   global conn
   global cursor
 
   try:
-    conn = pymysql.connect(host     = parser.get('db_config', 'hostname'),
-                           user     = parser.get('db_config', 'username'),
-                           password = parser.get('db_config', 'password'),
-                           db       = parser.get('db_config', 'database'),
-                           port     = parser.getint('db_config', 'port'),
+    conn = pymysql.connect(host     = parser['db_config']['hostname'], #parser.get('db_config', 'hostname'),
+                           user     = parser['db_config']['username'], #parser.get('db_config', 'username'),
+                           password = parser['db_config']['password'], #parser.get('db_config', 'password'),
+                           database = parser['db_config']['database'], #parser.get('db_config', 'database'),
+                           port     = int(parser['db_config']['port']), #parser.getint('db_config', 'port'),
                            charset  ='utf8')
   except pymysql.err.MySQLError as e :
     print(f"DB 연결 오류 :: {e}")
@@ -125,7 +130,11 @@ def job_pension_new() :
 
   print("########## job_pension end ##########")
 
-db_conn()
-job_lucky_new()
-job_pension_new()
-db_close()
+def step_process() :
+  get_config()
+  db_conn()
+  job_lucky_new()
+  job_pension_new()
+  db_close()
+
+step_process()
