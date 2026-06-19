@@ -26,7 +26,7 @@ def get_config() :
 def db_conn() :
   global conn
   global cursor
-
+  
   try:
     conn = pymysql.connect(host     = parser['db_config']['hostname'], #parser.get('db_config', 'hostname'),
                            user     = parser['db_config']['username'], #parser.get('db_config', 'username'),
@@ -49,13 +49,12 @@ def job_lucky_new() :
   org_data = get_data.json()
   process_1_data = org_data.get("data")
   process_2_data = process_1_data.get("list")
-  ## print(">> process_2_data :: ", process_2_data[0])
+  #print(">> process_2_data :: ", process_2_data[0])
 
   ## 저장되어있는 회차 가져오기
   cursor.execute(lucky_last_round)
   get_data = cursor.fetchone()
   old_last_round = get_data[0]
-
   ## 새로운 회차 가져오기2
   item = process_2_data[0]
   new_round = str(item.get("ltEpsd")) + "회"
